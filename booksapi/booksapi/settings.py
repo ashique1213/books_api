@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os 
 from dotenv import load_dotenv
+from datetime import timedelta
+
 
 # Load enviorment variables from .env file
 load_dotenv()
@@ -92,6 +94,17 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = "authentication.User"
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+    
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -111,6 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
