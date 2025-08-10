@@ -461,7 +461,6 @@ Uses **JWT** (`djangorestframework-simplejwt`). Include the access token in Post
          "book": {
              "id": 1,
              "title": "Sample Book",
-             ...
          },
          "book_id": 1,
          "order": 1,
