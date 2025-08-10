@@ -247,5 +247,3 @@ Create a Postman collection with the following:
 
 ## Notes
 - Uses SQLite by default; configure PostgreSQL in `settings.py` for production.
-- Create a superuser for admin access: `python manage.py createsuperuser`.
-- Admin interface: `http://localhost:8000/admin/`.
