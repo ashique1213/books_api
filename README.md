@@ -1,4 +1,4 @@
-# Django REST API - Book Management lvManagement
+# Django REST API - Book Management Management
 
 ## Overview
 A Django REST Framework API for managing users, books, and reading lists. Features include user registration/login (JWT-based), book creation/removal, and reading list management. Tested using **Postman**.
