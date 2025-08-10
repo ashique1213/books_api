@@ -41,3 +41,20 @@ class BookDetailView(APIView):
             return Response({"message": "Book deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
         except Book.DoesNotExist:
             return Response({"error": "Book not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+class ReadingListListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        reading_lists = ReadingList.objects.filter(user=request.user)
+        serializer = ReadingListSerializer(reading_lists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ReadingListSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    
+

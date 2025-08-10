@@ -13,3 +13,13 @@ class Book(models.Model):
 
     class Meta:
         db_table = 'books'
+
+class ReadingList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reading_lists')
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'reading_lists'
+        unique_together = ('user', 'name')
