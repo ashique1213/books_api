@@ -58,3 +58,34 @@ class ReadingListListCreateView(APIView):
         return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     
 
+class ReadingListDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            reading_list = ReadingList.objects.get(pk=pk, user=request.user)
+            serializer = ReadingListSerializer(reading_list)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ReadingList.DoesNotExist:
+            return Response({"error": "Reading list not found or you do not have permission to access it."}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            reading_list = ReadingList.objects.get(pk=pk, user=request.user)
+            serializer = ReadingListSerializer(reading_list, data=request.data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except ReadingList.DoesNotExist:
+            return Response({"error": "Reading list not found or you do not have permission to access it."}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            reading_list = ReadingList.objects.get(pk=pk, user=request.user)
+            reading_list.delete()
+            return Response({"message": "Reading list deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except ReadingList.DoesNotExist:
+            return Response({"error": "Reading list not found or you do not have permission to access it."}, status=status.HTTP_404_NOT_FOUND)
+    
+
