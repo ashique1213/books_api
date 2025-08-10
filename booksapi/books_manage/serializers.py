@@ -18,3 +18,13 @@ class ReadingListSerializer(serializers.ModelSerializer):
         model = ReadingList
         fields = ['id', 'user', 'name', 'created_at', 'updated_at']
         read_only_fields = ['user', 'created_at', 'updated_at']
+
+
+class ReadingListItemSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    book_id = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), source='book', write_only=True)
+
+    class Meta:
+        model = ReadingListItem
+        fields = ['id', 'reading_list', 'book', 'book_id', 'order', 'added_at']
+        read_only_fields = ['reading_list', 'book', 'added_at']

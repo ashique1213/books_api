@@ -23,3 +23,15 @@ class ReadingList(models.Model):
     class Meta:
         db_table = 'reading_lists'
         unique_together = ('user', 'name')
+
+
+class ReadingListItem(models.Model):
+    reading_list = models.ForeignKey(ReadingList, on_delete=models.CASCADE, related_name='items')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reading_list_items')
+    order = models.PositiveIntegerField(default=0)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'reading_list_items'
+        unique_together = ('reading_list', 'book')
+        ordering = ['order']
