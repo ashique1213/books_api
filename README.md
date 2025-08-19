@@ -247,3 +247,5 @@ Create a Postman collection with the following:
 
 ## Notes
 - Uses SQLite by default; configure PostgreSQL in `settings.py` for production.
+
+
