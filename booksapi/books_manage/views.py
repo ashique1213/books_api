@@ -109,6 +109,17 @@ class ReadingListDetailView(APIView):
 class ReadingListItemCreateDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request, pk):
+        try:
+            reading_list = ReadingList.objects.get(pk=pk, user=request.user)
+            items = ReadingListItem.objects.filter(reading_list=reading_list).order_by('order')
+            serializer = ReadingListItemSerializer(items, many=True, context={'request': request})
+            logger.info(f"Retrieved items for reading list by {request.user.username}: List ID {pk}")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ReadingList.DoesNotExist:
+            logger.error(f"Reading list not found or unauthorized: ID {pk}")
+            return Response({"error": "Reading list not found or you do not have permission to access it."}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, pk):
         try:
             reading_list = ReadingList.objects.get(pk=pk, user=request.user)
