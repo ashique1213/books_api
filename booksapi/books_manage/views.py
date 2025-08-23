@@ -5,16 +5,22 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework import status
 from .models import Book, ReadingList, ReadingListItem
 from .serializers import BookSerializer, ReadingListSerializer, ReadingListItemSerializer
+from rest_framework.pagination import PageNumberPagination
 
 logger = logging.getLogger(__name__)
 
 class BookListCreateView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = PageNumberPagination
 
     def get(self, request):
         books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = self.pagination_class()
+        paginator.page_size = 10
+        page = paginator.paginate_queryset(books, request)
+        serializer = BookSerializer(page, many=True, context={'request': request})
+        logger.info(f"Retrieved paginated book list by {request.user.username if request.user.is_authenticated else 'anonymous'}")
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = BookSerializer(data=request.data, context={'request': request})
