@@ -14,22 +14,30 @@ class BookListCreateView(APIView):
     pagination_class = PageNumberPagination
 
     def get(self, request):
-        books = Book.objects.all()
-        paginator = self.pagination_class()
-        paginator.page_size = 10
-        page = paginator.paginate_queryset(books, request)
-        serializer = BookSerializer(page, many=True, context={'request': request})
-        logger.info(f"Retrieved paginated book list by {request.user.username if request.user.is_authenticated else 'anonymous'}")
-        return paginator.get_paginated_response(serializer.data)
+        try:
+            books = Book.objects.all()
+            paginator = self.pagination_class()
+            paginator.page_size = 10
+            page = paginator.paginate_queryset(books, request)
+            serializer = BookSerializer(page, many=True, context={'request': request})
+            logger.info(f"Retrieved paginated book list by {request.user.username if request.user.is_authenticated else 'anonymous'}")
+            return paginator.get_paginated_response(serializer.data)
+        except Exception as e:
+            logger.error(f"Book list retrieval error: {str(e)}")
+            return Response({"error": "Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
-        serializer = BookSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(created_by=request.user)
-            logger.info(f"Book created by {request.user.username}: {serializer.data.get('title')}")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        logger.error(f"Book creation failed: {serializer.errors}")
-        return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = BookSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save(created_by=request.user)
+                logger.info(f"Book created by {request.user.username}: {serializer.data.get('title', 'unknown')}")
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            logger.warning(f"Book creation failed: {serializer.errors}")
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Book creation error for {request.user.username}: {str(e)}")
+            return Response({"error": "Something went wrong"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BookDetailView(APIView):
