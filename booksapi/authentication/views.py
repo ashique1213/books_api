@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .serializers import UserRegistrationSerializer, UserProfileSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 logger = logging.getLogger(__name__)
 
@@ -33,3 +34,19 @@ class UserProfileView(APIView):
             return Response(serializer.data)
         logger.error(f"User profile update failed for {request.user.username}: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            print(request.data)
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            logger.info(f"User logged out successfully: {request.user.username}")
+            return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Logout failed for {request.user.username}: {str(e)}")
+            return Response({"error": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
